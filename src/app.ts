@@ -1,31 +1,38 @@
 import express from 'express';
-import asyncRedis from 'async-redis';
-import axios from 'axios';
+import { client } from './helper/dbHelper';
+
+import HttpController from './controllers/httpController';
+
+const UPDATE_INTERVAL: number = 60000;
 
 const port: number = 3000;
 
 const app = express();
 
-const isProduction =
-  process.env.NODE_ENV !== undefined && process.env.NODE_ENV === 'production';
+const parkhaus = new HttpController(
+  'https://www.stadt-muenster.de/index.php?id=10910',
+  'parkhaus'
+);
 
-const client = asyncRedis.createClient({
-  host: isProduction ? 'redis' : '127.0.0.1',
-});
+// ... init new controller here
 
-client.on('error', (error) => {
-  console.error(error);
-});
-
-client.on('connect', async () => {
-  const parkhausReq = await axios.get(
-    'https://www.stadt-muenster.de/index.php?id=10910'
-  );
-  const parkhausData = await parkhausReq.data;
-  await client.set('parkhaus', JSON.stringify(parkhausData));
+client.on('connect', () => {
+  // update our datasets in interval
+  setInterval(async () => {
+    await parkhaus.update();
+  }, UPDATE_INTERVAL);
 });
 
 app.get('/', async (req, res) => {
+  res.header('Content-Type', 'text/plain; charset=utf-8');
+  res.send(`
+  Available Routes:
+  
+  GET \t/parkhaus \tParkhaus data
+  `);
+});
+
+app.get('/parkhaus', async (req, res) => {
   const data = await client.get('parkhaus');
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
