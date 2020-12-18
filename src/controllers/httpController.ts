@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import BaseController from './baseController';
 import { client } from '../helper/dbHelper';
 

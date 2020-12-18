@@ -1,3 +1,6 @@
 node_modules
 dist
 *.log
+
+docker-compose.yml
+.DS_Store
