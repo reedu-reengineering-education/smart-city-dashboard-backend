@@ -1,12 +1,13 @@
-version: "3.2"
+version: '3.2'
 services:
   app:
     build: .
     environment:
       - NODE_ENV=production
+      - HYSTREETS_API_TOKEN=<API_TOKEN_HERE>
     ports:
       - 3000:3000
   redis:
-    image: "redis:alpine"
+    image: 'redis:alpine'
     ports:
-      - "6379:6379"
+      - '6379:6379'
