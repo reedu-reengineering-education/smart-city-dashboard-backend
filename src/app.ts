@@ -20,6 +20,10 @@ const pedenstrianCountRothenburg = new HystreetController(
   'https://hystreet.com/api/locations/100',
   'pedenstrianCountRothenburg',
   {
+    latitude: 51.96064,
+    longitude: 7.62598,
+  },
+  {
     headers: {
       'Content-Type': 'application/vnd.hystreet.v1',
       'X-API-Token': process.env.HYSTREETS_API_TOKEN,
@@ -30,6 +34,10 @@ const pedenstrianCountLudgeristraße = new HystreetController(
   'https://hystreet.com/api/locations/117',
   'pedenstrianCountLudgeristraße',
   {
+    latitude: 51.957076,
+    longitude: 7.626644,
+  },
+  {
     headers: {
       'Content-Type': 'application/vnd.hystreet.v1',
       'X-API-Token': process.env.HYSTREETS_API_TOKEN,
@@ -39,6 +47,10 @@ const pedenstrianCountLudgeristraße = new HystreetController(
 const pedenstrianCountAlterFischmarkt = new HystreetController(
   'https://hystreet.com/api/locations/296',
   'pedenstrianCountAlterFischmarkt',
+  {
+    latitude: 51.963504,
+    longitude: 7.629157,
+  },
   {
     headers: {
       'Content-Type': 'application/vnd.hystreet.v1',
@@ -74,6 +86,7 @@ app.get('/', async (req, res) => {
   Available Routes:
   
   GET \t/parkhaus \tParkhaus data
+  GET \t/pedestrian \Passanten data
   `);
 });
 

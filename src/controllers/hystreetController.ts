@@ -15,6 +15,7 @@ export default class HystreetController extends HttpController {
   constructor(
     public url: string,
     public key: string,
+    public location: any,
     public reqConfig?: AxiosRequestConfig
   ) {
     super(url, key);
@@ -33,7 +34,16 @@ export default class HystreetController extends HttpController {
     try {
       const request = await axios.get(url, this.reqConfig);
       const data = await request.data;
-      return await client.set(this.key, JSON.stringify(data));
+      return await client.set(
+        this.key,
+        JSON.stringify({
+          ...data,
+          metadata: {
+            ...data.metadata,
+            location: this.location,
+          },
+        })
+      );
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
         reject(error);
