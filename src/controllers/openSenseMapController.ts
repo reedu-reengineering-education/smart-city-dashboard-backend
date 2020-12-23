@@ -1,13 +1,14 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import BaseController from './baseController';
+import { SMA } from 'downsample';
+
 import { client } from '../helper/dbHelper';
-import HttpController from './httpController';
 import { updateQueryStringParameter } from '../helper/queryStringHelper';
+import HttpController from './httpController';
 
 /**
  * @description HttpController fetches and updates json data from http(s) endpoints. It extends the abstract BaseController
  */
-export default class HystreetController extends HttpController {
+export default class OpenSenseMapController extends HttpController {
   /**
    * @description Creates new instance of a controller to fetch data
    * @param url url to request data from
@@ -16,7 +17,6 @@ export default class HystreetController extends HttpController {
   constructor(
     public url: string,
     public key: string,
-    public location: any,
     public reqConfig?: AxiosRequestConfig
   ) {
     super(url, key);
@@ -27,24 +27,26 @@ export default class HystreetController extends HttpController {
    */
   public async update(): Promise<boolean> {
     let fromRaw = new Date();
-    fromRaw.setHours(fromRaw.getHours() - 1);
+    fromRaw.setHours(fromRaw.getHours() - 24);
     const from = fromRaw.toISOString();
-    const to = new Date().toISOString();
-    let url = updateQueryStringParameter(this.url, 'from', from);
-    url = updateQueryStringParameter(url, 'to', to);
+    let url = updateQueryStringParameter(this.url, 'from-date', from);
+
     try {
       const request = await axios.get(url, this.reqConfig);
-      const data = await request.data;
-      return await client.set(
-        this.key,
-        JSON.stringify({
-          ...data,
-          metadata: {
-            ...data.metadata,
-            location: this.location,
-          },
-        })
-      );
+      const data = [
+        ...(await request.data.map((x) => [
+          new Date(x.createdAt),
+          Number(x.value),
+        ])),
+      ];
+
+      // downsample dataset and round values to 2 decimals
+      const smooth = SMA(data, 48, 30).map((value: any) => ({
+        ...value,
+        y: Math.round(value.y * 100) / 100,
+      }));
+
+      return await client.set(this.key, JSON.stringify(smooth));
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
         reject(error);

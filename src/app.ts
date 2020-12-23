@@ -1,11 +1,14 @@
 import express from 'express';
+
 import { client } from './helper/dbHelper';
 
 import HttpController from './controllers/httpController';
 import HystreetController from './controllers/hystreetController';
+import OpenSenseMapController from './controllers/openSenseMapController';
 
 const PARKHAUS_UPDATE_INTERVAL: number = 60000;
 const HYSTREET_UPDATE_INTERVAL: number = 3600000;
+const OPENSENSEMAP_UPDATE_INTERVAL: number = 30000;
 
 const port: number = 3000;
 
@@ -59,6 +62,16 @@ const pedenstrianCountAlterFischmarkt = new HystreetController(
   }
 );
 
+const openSenseMapTemperature24 = new OpenSenseMapController(
+  'https://api.opensensemap.org/boxes/5d91f4bb5f3de0001ab6bb78/data/5d91f4bb5f3de0001ab6bb7f',
+  'osemTemperature24'
+);
+
+const openSenseMapHumidity24 = new OpenSenseMapController(
+  'https://api.opensensemap.org/boxes/5d91f4bb5f3de0001ab6bb78/data/5d91f4bb5f3de0001ab6bb7e',
+  'osemHumidity24'
+);
+
 // ... init new controller here
 
 client.on('connect', () => {
@@ -73,11 +86,19 @@ client.on('connect', () => {
     await pedenstrianCountAlterFischmarkt.update();
   }, HYSTREET_UPDATE_INTERVAL);
 
+  setInterval(async () => {
+    await openSenseMapTemperature24.update();
+    await openSenseMapHumidity24.update();
+  }, OPENSENSEMAP_UPDATE_INTERVAL);
+
   // initial fetch when application starts
   parkhaus.update();
   pedenstrianCountRothenburg.update();
   pedenstrianCountLudgeristraße.update();
   pedenstrianCountAlterFischmarkt.update();
+
+  openSenseMapTemperature24.update();
+  openSenseMapHumidity24.update();
 });
 
 app.get('/', async (req, res) => {
@@ -86,12 +107,26 @@ app.get('/', async (req, res) => {
   Available Routes:
   
   GET \t/parkhaus \tParkhaus data
-  GET \t/pedestrian \Passanten data
+  GET \t/opensensemapTemperature24 \topensensemap temperature 24h moving average
+  GET \t/opensensemapHumidity24 \Popensensemap humidity 24h moving average
+  GET \t/pedestrian \tPassanten data
   `);
 });
 
 app.get('/parkhaus', async (req, res) => {
   const data = await client.get('parkhaus');
+  res.setHeader('Content-Type', 'application/json');
+  res.send(data);
+});
+
+app.get('/opensensemapTemperature24', async (req, res) => {
+  const data = await client.get('osemTemperature24');
+  res.setHeader('Content-Type', 'application/json');
+  res.send(data);
+});
+
+app.get('/opensensemapHumidity24', async (req, res) => {
+  const data = await client.get('osemHumidity24');
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
 });
