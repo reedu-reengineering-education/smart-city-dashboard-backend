@@ -1,17 +1,18 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import BaseController from './baseController';
 import { client } from '../helper/dbHelper';
 import HttpController from './httpController';
 import { updateQueryStringParameter } from '../helper/queryStringHelper';
 
 /**
- * @description HttpController fetches and updates json data from http(s) endpoints. It extends the abstract BaseController
+ * @description HttpController fetches and updates json data from http(s) endpoints. It extends the HttpController
  */
 export default class HystreetController extends HttpController {
   /**
    * @description Creates new instance of a controller to fetch data
-   * @param url url to request data from
-   * @param key key to store response data in redisDB
+   * @param {string} url url to request data from
+   * @param {string} key key to store response data in redisDB
+   * @param {ILocation} location location object
+   * @param {AxiosRequestConfig} [reqConfig] optional axios request configuration
    */
   constructor(
     public url: string,
@@ -19,7 +20,7 @@ export default class HystreetController extends HttpController {
     public location: any,
     public reqConfig?: AxiosRequestConfig
   ) {
-    super(url, key);
+    super(url, key, location);
   }
 
   /**

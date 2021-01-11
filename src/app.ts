@@ -72,6 +72,15 @@ const openSenseMapHumidity24 = new OpenSenseMapController(
   'osemHumidity24'
 );
 
+const aasee = new HttpController(
+  'https://datahub.digital/api/device/832/packets?auth=D3C9FBF4-C2F2-4AE1-9D5C-056B4119B1DD',
+  'aasee',
+  {
+    latitude: 51.957148,
+    longitude: 7.614297,
+  }
+);
+
 // ... init new controller here
 
 client.on('connect', () => {
@@ -89,6 +98,7 @@ client.on('connect', () => {
   setInterval(async () => {
     await openSenseMapTemperature24.update();
     await openSenseMapHumidity24.update();
+    await aasee.update();
   }, OPENSENSEMAP_UPDATE_INTERVAL);
 
   // initial fetch when application starts
@@ -99,17 +109,20 @@ client.on('connect', () => {
 
   openSenseMapTemperature24.update();
   openSenseMapHumidity24.update();
+
+  aasee.update();
 });
 
 app.get('/', async (req, res) => {
   res.header('Content-Type', 'text/plain; charset=utf-8');
   res.send(`
   Available Routes:
-  
-  GET \t/parkhaus \tParkhaus data
+
+  GET \t/parkhaus \t\t\tParkhaus data
   GET \t/opensensemapTemperature24 \topensensemap temperature 24h moving average
-  GET \t/opensensemapHumidity24 \Popensensemap humidity 24h moving average
-  GET \t/pedestrian \tPassanten data
+  GET \t/opensensemapHumidity24 \topensensemap humidity 24h moving average
+  GET \t/pedestrian \t\t\tPassanten data
+  GET \t/aasee \t\t\t\tAasee data
   `);
 });
 
@@ -142,6 +155,12 @@ app.get('/pedestrian', async (req, res) => {
     JSON.parse(ludgeristraße),
     JSON.parse(alterFischmarkt),
   ];
+  res.setHeader('Content-Type', 'application/json');
+  res.send(data);
+});
+
+app.get('/aasee', async (req, res) => {
+  const data = await client.get('aasee');
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
 });
