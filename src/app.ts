@@ -23,8 +23,8 @@ const pedenstrianCountRothenburg = new HystreetController(
   'https://hystreet.com/api/locations/100',
   'pedenstrianCountRothenburg',
   {
-    latitude: 51.96064,
-    longitude: 7.62598,
+    latitude: 51.96092,
+    longitude: 7.626948,
   },
   {
     headers: {
@@ -37,8 +37,8 @@ const pedenstrianCountLudgeristraße = new HystreetController(
   'https://hystreet.com/api/locations/117',
   'pedenstrianCountLudgeristraße',
   {
-    latitude: 51.957076,
-    longitude: 7.626644,
+    latitude: 51.960353,
+    longitude: 7.627721,
   },
   {
     headers: {
@@ -51,8 +51,8 @@ const pedenstrianCountAlterFischmarkt = new HystreetController(
   'https://hystreet.com/api/locations/296',
   'pedenstrianCountAlterFischmarkt',
   {
-    latitude: 51.963504,
-    longitude: 7.629157,
+    latitude: 51.963543,
+    longitude: 7.629283,
   },
   {
     headers: {
