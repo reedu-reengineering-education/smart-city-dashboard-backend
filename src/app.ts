@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 
 import { client } from './helper/dbHelper';
 
@@ -13,6 +14,10 @@ const OPENSENSEMAP_UPDATE_INTERVAL: number = 30000;
 const port: number = 3000;
 
 const app = express();
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors());
+}
 
 const parkhaus = new HttpController(
   'https://www.stadt-muenster.de/index.php?id=10910',
