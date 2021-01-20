@@ -28,7 +28,7 @@ export default class HystreetController extends HttpController {
    */
   public async update(): Promise<boolean> {
     let fromRaw = new Date();
-    fromRaw.setHours(fromRaw.getHours() - 1);
+    fromRaw.setHours(fromRaw.getHours() - 24);
     const from = fromRaw.toISOString();
     const to = new Date().toISOString();
     let url = updateQueryStringParameter(this.url, 'from', from);
