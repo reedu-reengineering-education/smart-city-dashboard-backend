@@ -32,7 +32,7 @@ export default class OpenSenseMapController extends HttpController {
     let url = updateQueryStringParameter(this.url, 'from-date', from);
 
     try {
-      const request = await axios.get(url, this.options.reqConfig);
+      const request = await axios.get(url, this.options?.reqConfig || {});
       const data = [
         ...(await request.data.map((x) => [
           new Date(x.createdAt),
