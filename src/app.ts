@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 
+// reprojecting parkhaus data
+// @ts-ignore
+import { toWgs84 } from 'reproject';
+var epsg = require('epsg');
+
 import { client } from './helper/dbHelper';
 
 import HttpController from './controllers/httpController';
@@ -21,20 +26,31 @@ if (process.env.NODE_ENV !== 'production') {
 
 const parkhaus = new HttpController(
   'https://www.stadt-muenster.de/index.php?id=10910',
-  'parkhaus'
+  'parkhaus',
+  {
+    formatter: (data) => {
+      return toWgs84(
+        data,
+        '+proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=3500000 +y_0=0 +ellps=bessel +towgs84=598.1,73.7,418.2,0.202,0.045,-2.455,6.7 +units=m +no_defs',
+        epsg
+      );
+    },
+  }
 );
 
 const pedenstrianCountRothenburg = new HystreetController(
   'https://hystreet.com/api/locations/100',
   'pedenstrianCountRothenburg',
   {
-    latitude: 51.96092,
-    longitude: 7.626948,
-  },
-  {
-    headers: {
-      'Content-Type': 'application/vnd.hystreet.v1',
-      'X-API-Token': process.env.HYSTREETS_API_TOKEN,
+    location: {
+      latitude: 51.96092,
+      longitude: 7.626948,
+    },
+    reqConfig: {
+      headers: {
+        'Content-Type': 'application/vnd.hystreet.v1',
+        'X-API-Token': process.env.HYSTREETS_API_TOKEN,
+      },
     },
   }
 );
@@ -42,13 +58,15 @@ const pedenstrianCountLudgeristraße = new HystreetController(
   'https://hystreet.com/api/locations/117',
   'pedenstrianCountLudgeristraße',
   {
-    latitude: 51.960353,
-    longitude: 7.627721,
-  },
-  {
-    headers: {
-      'Content-Type': 'application/vnd.hystreet.v1',
-      'X-API-Token': process.env.HYSTREETS_API_TOKEN,
+    location: {
+      latitude: 51.960353,
+      longitude: 7.627721,
+    },
+    reqConfig: {
+      headers: {
+        'Content-Type': 'application/vnd.hystreet.v1',
+        'X-API-Token': process.env.HYSTREETS_API_TOKEN,
+      },
     },
   }
 );
@@ -56,13 +74,15 @@ const pedenstrianCountAlterFischmarkt = new HystreetController(
   'https://hystreet.com/api/locations/296',
   'pedenstrianCountAlterFischmarkt',
   {
-    latitude: 51.963543,
-    longitude: 7.629283,
-  },
-  {
-    headers: {
-      'Content-Type': 'application/vnd.hystreet.v1',
-      'X-API-Token': process.env.HYSTREETS_API_TOKEN,
+    location: {
+      latitude: 51.963543,
+      longitude: 7.629283,
+    },
+    reqConfig: {
+      headers: {
+        'Content-Type': 'application/vnd.hystreet.v1',
+        'X-API-Token': process.env.HYSTREETS_API_TOKEN,
+      },
     },
   }
 );
@@ -81,8 +101,10 @@ const aasee = new HttpController(
   'https://datahub.digital/api/device/832/packets?auth=D3C9FBF4-C2F2-4AE1-9D5C-056B4119B1DD',
   'aasee',
   {
-    latitude: 51.957148,
-    longitude: 7.614297,
+    location: {
+      latitude: 51.957148,
+      longitude: 7.614297,
+    },
   }
 );
 

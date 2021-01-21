@@ -3,7 +3,7 @@ import { SMA } from 'downsample';
 
 import { client } from '../helper/dbHelper';
 import { updateQueryStringParameter } from '../helper/queryStringHelper';
-import HttpController from './httpController';
+import HttpController, { IOptions } from './httpController';
 
 /**
  * @description HttpController fetches and updates json data from http(s) endpoints. It extends the abstract BaseController
@@ -17,9 +17,9 @@ export default class OpenSenseMapController extends HttpController {
   constructor(
     public url: string,
     public key: string,
-    public reqConfig?: AxiosRequestConfig
+    public options?: IOptions
   ) {
-    super(url, key);
+    super(url, key, options);
   }
 
   /**
@@ -32,7 +32,7 @@ export default class OpenSenseMapController extends HttpController {
     let url = updateQueryStringParameter(this.url, 'from-date', from);
 
     try {
-      const request = await axios.get(url, this.reqConfig);
+      const request = await axios.get(url, this.options.reqConfig);
       const data = [
         ...(await request.data.map((x) => [
           new Date(x.createdAt),

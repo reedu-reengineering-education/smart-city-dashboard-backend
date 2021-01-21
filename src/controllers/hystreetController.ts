@@ -1,7 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { client } from '../helper/dbHelper';
-import HttpController from './httpController';
+import HttpController, { IOptions } from './httpController';
 import { updateQueryStringParameter } from '../helper/queryStringHelper';
+
+interface IHystreetOptions extends IOptions {
+  reqConfig: AxiosRequestConfig;
+}
 
 /**
  * @description HttpController fetches and updates json data from http(s) endpoints. It extends the HttpController
@@ -17,10 +21,9 @@ export default class HystreetController extends HttpController {
   constructor(
     public url: string,
     public key: string,
-    public location: any,
-    public reqConfig?: AxiosRequestConfig
+    public options: IHystreetOptions
   ) {
-    super(url, key, location);
+    super(url, key, options);
   }
 
   /**
@@ -34,7 +37,7 @@ export default class HystreetController extends HttpController {
     let url = updateQueryStringParameter(this.url, 'from', from);
     url = updateQueryStringParameter(url, 'to', to);
     try {
-      const request = await axios.get(url, this.reqConfig);
+      const request = await axios.get(url, this.options.reqConfig);
       const data = await request.data;
       return await client.set(
         this.key,
@@ -42,7 +45,7 @@ export default class HystreetController extends HttpController {
           ...data,
           metadata: {
             ...data.metadata,
-            location: this.location,
+            location: this.options.location,
           },
         })
       );
