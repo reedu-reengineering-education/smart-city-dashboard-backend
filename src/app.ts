@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import cron from 'node-cron';
 
 // reprojecting parkhaus data
 // @ts-ignore
@@ -12,9 +13,9 @@ import HttpController from './controllers/httpController';
 import HystreetController from './controllers/hystreetController';
 import OpenSenseMapController from './controllers/openSenseMapController';
 
-const PARKHAUS_UPDATE_INTERVAL: number = 60000;
-const HYSTREET_UPDATE_INTERVAL: number = 3600000;
-const OPENSENSEMAP_UPDATE_INTERVAL: number = 30000;
+const PARKHAUS_UPDATE_INTERVAL: string = '*/5 * * * *';
+const HYSTREET_UPDATE_INTERVAL: string = '0 * * * *';
+const OPENSENSEMAP_UPDATE_INTERVAL: string = '* * * * *';
 
 const port: number = 3000;
 
@@ -111,25 +112,26 @@ const aasee = new HttpController(
 // ... init new controller here
 
 client.on('connect', () => {
-  // update our datasets in interval
-  setInterval(async () => {
+  // update our datasets with node-cron
+  cron.schedule(PARKHAUS_UPDATE_INTERVAL, async () => {
     await parkhaus.update();
-  }, PARKHAUS_UPDATE_INTERVAL);
+  });
 
-  setInterval(async () => {
+  cron.schedule(HYSTREET_UPDATE_INTERVAL, async () => {
     await pedenstrianCountRothenburg.update();
     await pedenstrianCountLudgeristraße.update();
     await pedenstrianCountAlterFischmarkt.update();
-  }, HYSTREET_UPDATE_INTERVAL);
+  });
 
-  setInterval(async () => {
+  cron.schedule(OPENSENSEMAP_UPDATE_INTERVAL, async () => {
     await openSenseMapTemperature24.update();
     await openSenseMapHumidity24.update();
     await aasee.update();
-  }, OPENSENSEMAP_UPDATE_INTERVAL);
+  });
 
   // initial fetch when application starts
   parkhaus.update();
+
   pedenstrianCountRothenburg.update();
   pedenstrianCountLudgeristraße.update();
   pedenstrianCountAlterFischmarkt.update();
