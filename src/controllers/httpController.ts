@@ -41,7 +41,7 @@ export default class HttpController extends BaseController {
    */
   public async update(): Promise<boolean> {
     try {
-      const request = await axios.get(this.url);
+      const request = await axios.get(this.url, this.options?.reqConfig ?? {});
       let data = await request.data;
 
       if (this.options?.formatter) {

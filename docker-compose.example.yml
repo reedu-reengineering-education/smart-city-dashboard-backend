@@ -5,6 +5,7 @@ services:
     environment:
       - NODE_ENV=production
       - HYSTREETS_API_TOKEN=<API_TOKEN_HERE>
+      - ECO_COUNTER_API_TOKEN=<API_TOKEN_HERE>
     ports:
       - 3000:3000
   redis:

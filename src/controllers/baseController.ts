@@ -15,5 +15,5 @@ export default abstract class BaseController {
    * @description Fetch new data and update redisDB
    * @returns Promise<boolean> whether update was successful
    */
-  public abstract update(): Promise<boolean>;
+  public abstract update(): Promise<boolean> | Promise<boolean[]>;
 }

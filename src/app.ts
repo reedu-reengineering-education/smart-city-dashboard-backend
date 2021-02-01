@@ -12,10 +12,12 @@ import { client } from './helper/dbHelper';
 import HttpController from './controllers/httpController';
 import HystreetController from './controllers/hystreetController';
 import OpenSenseMapController from './controllers/openSenseMapController';
+import EcoCounterController from './controllers/ecoCounterController';
 
-const PARKHAUS_UPDATE_INTERVAL: string = '*/5 * * * *';
-const HYSTREET_UPDATE_INTERVAL: string = '0 * * * *';
-const OPENSENSEMAP_UPDATE_INTERVAL: string = '* * * * *';
+const PARKHAUS_UPDATE_INTERVAL: string = '*/5 * * * *'; // all 5 minutes
+const HYSTREET_UPDATE_INTERVAL: string = '*/20 * * * *'; // all 20 minutes
+const OPENSENSEMAP_UPDATE_INTERVAL: string = '* * * * *'; // each minute
+const ECO_COUNTER_UPDATE_INTERVAL: string = '0 0 * * *'; // everyday at 00:00
 
 const port: number = 3000;
 
@@ -109,6 +111,19 @@ const aasee = new HttpController(
   }
 );
 
+const bicycle = new EcoCounterController(
+  'https://apieco.eco-counter-tools.com/api/1.0/site',
+  'bicycle',
+  {
+    reqConfig: {
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${process.env.ECO_COUNTER_API_TOKEN}`,
+      },
+    },
+  }
+);
+
 // ... init new controller here
 
 client.on('connect', () => {
@@ -129,6 +144,10 @@ client.on('connect', () => {
     await aasee.update();
   });
 
+  cron.schedule(ECO_COUNTER_UPDATE_INTERVAL, async () => {
+    await bicycle.update();
+  });
+
   // initial fetch when application starts
   parkhaus.update();
 
@@ -140,6 +159,8 @@ client.on('connect', () => {
   openSenseMapHumidity24.update();
 
   aasee.update();
+
+  bicycle.update();
 });
 
 app.get('/', async (req, res) => {
@@ -152,6 +173,8 @@ app.get('/', async (req, res) => {
   GET \t/opensensemapHumidity24 \topensensemap humidity 24h moving average
   GET \t/pedestrian \t\t\tPassanten data
   GET \t/aasee \t\t\t\tAasee data
+  GET \t/bicycle \t\t\tBicycle data
+  GET \t/bicycle/:stationId \t\tBicycle data (last 7 days) of specific station
   `);
 });
 
@@ -190,6 +213,18 @@ app.get('/pedestrian', async (req, res) => {
 
 app.get('/aasee', async (req, res) => {
   const data = await client.get('aasee');
+  res.setHeader('Content-Type', 'application/json');
+  res.send(data);
+});
+
+app.get('/bicycle', async (req, res) => {
+  const data = await client.get('bicycle');
+  res.setHeader('Content-Type', 'application/json');
+  res.send(data);
+});
+
+app.get('/bicycle/:counterId', async (req, res) => {
+  const data = await client.get(`bicycle_${req.params.counterId}`);
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
 });
