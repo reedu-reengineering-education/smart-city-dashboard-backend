@@ -91,12 +91,12 @@ const pedenstrianCountAlterFischmarkt = new HystreetController(
 );
 
 const openSenseMapTemperature24 = new OpenSenseMapController(
-  'https://api.opensensemap.org/boxes/5d91f4bb5f3de0001ab6bb78/data/5d91f4bb5f3de0001ab6bb7f',
+  'https://api.opensensemap.org/boxes/5f7ddc9f692773001c7da31c/data/5f7ddc9f692773001c7da323',
   'osemTemperature24'
 );
 
 const openSenseMapHumidity24 = new OpenSenseMapController(
-  'https://api.opensensemap.org/boxes/5d91f4bb5f3de0001ab6bb78/data/5d91f4bb5f3de0001ab6bb7e',
+  'https://api.opensensemap.org/boxes/5f7ddc9f692773001c7da31c/data/5f7ddc9f692773001c7da322',
   'osemHumidity24'
 );
 
