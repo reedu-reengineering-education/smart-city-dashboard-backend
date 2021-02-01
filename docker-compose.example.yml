@@ -7,8 +7,8 @@ services:
       - HYSTREETS_API_TOKEN=<API_TOKEN_HERE>
       - ECO_COUNTER_API_TOKEN=<API_TOKEN_HERE>
     ports:
-      - 3000:3000
+      - 127.0.0.1:5000:3000
   redis:
     image: 'redis:alpine'
     ports:
-      - '6379:6379'
+      - 127.0.0.1:6379:6379
