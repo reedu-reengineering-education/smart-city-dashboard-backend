@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { client } from '../helper/dbHelper';
+import { client } from '../lib/redis';
 import HttpController, { IOptions } from './httpController';
-import { updateQueryStringParameter } from '../helper/queryStringHelper';
+import { isValidDate, updateQueryStringParameter } from '../utils';
 
 interface IHystreetOptions extends IOptions {
   reqConfig: AxiosRequestConfig;
@@ -49,6 +49,31 @@ export default class HystreetController extends HttpController {
           },
         })
       );
+    } catch (error) {
+      return new Promise<boolean>((resolve, reject) => {
+        reject(error);
+      });
+    }
+  }
+
+  public async getTimeSeriesData(from: Date, to: Date): Promise<any> {
+    if (!isValidDate(from) && !isValidDate(to)) {
+      return new Promise<boolean>((resolve, reject) => {
+        reject('Invalid Date');
+      });
+    }
+    let url = updateQueryStringParameter(this.url, 'from', from.toISOString());
+    url = updateQueryStringParameter(url, 'to', to.toISOString());
+    try {
+      const request = await axios.get(url, this.options.reqConfig);
+      const data = await request.data;
+      return JSON.stringify({
+        ...data,
+        metadata: {
+          ...data.metadata,
+          location: this.options.location,
+        },
+      });
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
         reject(error);

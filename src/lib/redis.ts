@@ -8,8 +8,4 @@ const client = asyncRedis.createClient({
   host: isProduction ? 'redis' : '127.0.0.1',
 });
 
-client.on('error', (error) => {
-  console.error(error);
-});
-
 export { client };

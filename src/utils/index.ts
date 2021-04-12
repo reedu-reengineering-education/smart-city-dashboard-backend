@@ -1,3 +1,4 @@
+// https://stackoverflow.com/a/6021027/5660646
 export const updateQueryStringParameter = (uri, key, value) => {
   var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');
   var separator = uri.indexOf('?') !== -1 ? '&' : '?';
@@ -6,4 +7,8 @@ export const updateQueryStringParameter = (uri, key, value) => {
   } else {
     return uri + separator + key + '=' + value;
   }
+};
+
+export const isValidDate = (d: any) => {
+  return d instanceof Date && !isNaN(d.valueOf());
 };

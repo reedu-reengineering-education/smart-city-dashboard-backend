@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { SMA } from 'downsample';
 
-import { client } from '../helper/dbHelper';
-import { updateQueryStringParameter } from '../helper/queryStringHelper';
+import { client } from '../lib/redis';
+import { isValidDate, updateQueryStringParameter } from '../utils';
 import HttpController, { IOptions } from './httpController';
 
 /**
@@ -47,6 +47,45 @@ export default class OpenSenseMapController extends HttpController {
       }));
 
       return await client.set(this.key, JSON.stringify(smooth));
+    } catch (error) {
+      return new Promise<boolean>((resolve, reject) => {
+        reject(error);
+      });
+    }
+  }
+
+  /**
+   * @description Fetches JSON data from endpoints and updates redisDB
+   */
+  public async getTimeSeriesData(from: Date, to: Date): Promise<any> {
+    if (!isValidDate(from) && !isValidDate(to)) {
+      return new Promise<boolean>((resolve, reject) => {
+        reject('Invalid Date');
+      });
+    }
+    let url = updateQueryStringParameter(
+      this.url,
+      'from-date',
+      from.toISOString()
+    );
+    url = updateQueryStringParameter(url, 'to-date', to.toISOString());
+
+    try {
+      const request = await axios.get(url, this.options?.reqConfig || {});
+      const data = [
+        ...(await request.data.map((x) => [
+          new Date(x.createdAt),
+          Number(x.value),
+        ])),
+      ];
+
+      // downsample dataset and round values to 2 decimals
+      const smooth = SMA(data, 48, 30).map((value: any) => ({
+        ...value,
+        y: Math.round(value.y * 100) / 100,
+      }));
+
+      return new Promise((resolve) => resolve(smooth));
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
         reject(error);

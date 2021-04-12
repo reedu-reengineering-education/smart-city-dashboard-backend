@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import BaseController from './baseController';
-import { client } from '../helper/dbHelper';
+import { client } from '../lib/redis';
 
 interface ILocation {
   latitude: number;

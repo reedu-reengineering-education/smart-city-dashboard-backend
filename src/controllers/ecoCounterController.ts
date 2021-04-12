@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import BaseController from './baseController';
-import { client } from '../helper/dbHelper';
-import { updateQueryStringParameter } from '../helper/queryStringHelper';
+import { client } from '../lib/redis';
+import { isValidDate, updateQueryStringParameter } from '../utils';
 
 export interface IOptions {
   reqConfig?: AxiosRequestConfig;
@@ -119,6 +119,60 @@ export default class EcoCounterController extends BaseController {
       ]);
     } catch (error) {
       return new Promise<boolean[]>((resolve, reject) => {
+        reject(error);
+      });
+    }
+  }
+
+  /**
+   * @description returns time series data from date to now
+   */
+  public async getTimeSeriesData(from: Date): Promise<any> {
+    if (!isValidDate(from)) {
+      return new Promise<boolean>((resolve, reject) => {
+        reject('Invalid Date');
+      });
+    }
+    try {
+      const request = await axios.get(this.url, this.options?.reqConfig ?? {});
+      let data = await request.data;
+
+      const counterPromises: Promise<any>[] = data.map(
+        async (counter: EcoCounterData) => {
+          const fromRaw = new Date(from);
+          fromRaw.setHours(0);
+          fromRaw.setMinutes(0);
+          fromRaw.setSeconds(0);
+          const fromDate = fromRaw.toISOString().slice(0, -5); // removing milliseconds to match ISO 8601
+
+          let url = updateQueryStringParameter(
+            COUNT_DATA_URL(counter.id),
+            'begin',
+            fromDate
+          );
+
+          const diffInMs = Date.now() - +new Date(fromRaw);
+          const diffInDays = Math.floor(diffInMs / (1000 * 3600 * 24));
+          if (diffInDays > 7) {
+            url = updateQueryStringParameter(url, 'step', 'day');
+          } else {
+            url = updateQueryStringParameter(url, 'step', 'hour');
+          }
+
+          const countDataRequest = await axios.get(
+            url,
+            this.options?.reqConfig ?? {}
+          );
+          return {
+            ...counter,
+            data: await countDataRequest.data,
+          };
+        }
+      );
+
+      return await Promise.all<any>(counterPromises);
+    } catch (error) {
+      return new Promise<any>((resolve, reject) => {
         reject(error);
       });
     }
