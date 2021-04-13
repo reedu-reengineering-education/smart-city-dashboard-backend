@@ -41,7 +41,7 @@ export default class OpenSenseMapController extends HttpController {
       ];
 
       // downsample dataset and round values to 2 decimals
-      const smooth = new Array(SMA(data, 48, 30)).map((value: any) => ({
+      const smooth = SMA(data, 48, 30).map((value: any) => ({
         ...value,
         y: Math.round(value.y * 100) / 100,
       }));
@@ -80,7 +80,7 @@ export default class OpenSenseMapController extends HttpController {
       ];
 
       // downsample dataset and round values to 2 decimals
-      const smooth = new Array(SMA(data, 48, 30)).map((value: any) => ({
+      const smooth = SMA(data, 48, 30).map((value: any) => ({
         ...value,
         y: Math.round(value.y * 100) / 100,
       }));
