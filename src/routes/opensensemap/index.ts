@@ -19,12 +19,6 @@ const openSenseMapHumidity24 = new OpenSenseMapController(
   'osemHumidity24'
 );
 
-router.get('/opensensemapHumidity24', async (req, res) => {
-  const data = await client.get('osemHumidity24');
-  res.setHeader('Content-Type', 'application/json');
-  res.send(data);
-});
-
 router.get('/timeseries', async (req, res) => {
   const from = new Date(req.query.from);
   const to = new Date(req.query.to);

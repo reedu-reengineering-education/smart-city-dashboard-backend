@@ -21,8 +21,7 @@ app.get('/', async (req, res) => {
   Available Routes:
 
   GET \t/parking \t\t\tParkhaus data
-  GET \t/opensensemap/opensensemapTemperature24 \topensensemap temperature 24h moving average
-  GET \t/opensensemap/opensensemapHumidity24 \topensensemap humidity 24h moving average
+  GET \t/opensensemap/timeseries \tmoving average timeseries data
   GET \t/pedestrian \t\t\tPassanten data
   GET \t/aasee \t\t\t\tAasee data
   GET \t/bicycle \t\t\tBicycle data
