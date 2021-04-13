@@ -6,6 +6,7 @@ services:
       - NODE_ENV=production
       - HYSTREETS_API_TOKEN=<API_TOKEN_HERE>
       - ECO_COUNTER_API_TOKEN=<API_TOKEN_HERE>
+      - DATAHUB_DIGITAL_TOKEN=<API_TOKEN_HERE>
     ports:
       - 127.0.0.1:5000:3000
   redis:
