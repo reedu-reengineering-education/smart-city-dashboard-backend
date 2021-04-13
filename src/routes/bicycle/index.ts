@@ -6,7 +6,7 @@ import EcoCounterController from '../../controllers/ecoCounterController';
 import { client } from '../../lib/redis';
 import { isValidDate } from '../../utils';
 
-const ECO_COUNTER_UPDATE_INTERVAL: string = '0 0 * * *'; // everyday at 00:00
+const ECO_COUNTER_UPDATE_INTERVAL: string = '0 * * * *'; // everyday at 00:00
 
 // controller
 const bicycle = new EcoCounterController(
