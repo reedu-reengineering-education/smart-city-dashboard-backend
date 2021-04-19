@@ -1,19 +1,20 @@
 const express = require('express');
 const router = express.Router();
 import cron from 'node-cron';
-import HttpController from '../../controllers/httpController';
 
 import { client } from '../../lib/redis';
 
 // reprojecting parkhaus data
 // @ts-ignore
 import { toWgs84 } from 'reproject';
+import { isValidDate } from '../../utils';
+import ParkingController from '../../controllers/parkingController';
 var epsg = require('epsg');
 
 const PARKHAUS_UPDATE_INTERVAL: string = '*/5 * * * *'; // all 5 minutes
 
 // controller
-const parkhaus = new HttpController(
+const parkhaus = new ParkingController(
   'https://www.stadt-muenster.de/index.php?id=10910',
   'parkhaus',
   {
@@ -38,6 +39,28 @@ client.on('connect', () => {
 // routes
 router.get('/', async (req, res) => {
   const data = await client.get('parkhaus');
+  res.setHeader('Content-Type', 'application/json');
+  res.send(data);
+});
+
+/**
+ * @description returns timeseries data of all parking stations
+ */
+router.get('/timeseries', async (req, res) => {
+  const from = new Date(req.query.from);
+  const to = new Date(req.query.to);
+
+  // wrong date
+  if (!isValidDate(from) || !isValidDate(to)) {
+    res
+      .json({
+        message: 'Invalid Date.',
+      })
+      .status(422);
+    return;
+  }
+  const data = await parkhaus.getTimeSeriesData(from, to);
+
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
 });
