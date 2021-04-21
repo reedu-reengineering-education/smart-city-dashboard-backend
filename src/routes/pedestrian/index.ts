@@ -57,17 +57,36 @@ const pedenstrianCountAlterFischmarkt = new HystreetController(
     },
   }
 );
+const pedenstrianCountSalzstraße = new HystreetController(
+  'https://hystreet.com/api/locations/310',
+  'pedenstrianCountSalzstraße',
+  {
+    location: {
+      latitude: 51.962038,
+      longitude: 7.630421,
+    },
+    reqConfig: {
+      headers: {
+        'Content-Type': 'application/vnd.hystreet.v1',
+        'X-API-Token': process.env.HYSTREETS_API_TOKEN,
+      },
+    },
+  }
+);
+
+const controllers = [
+  pedenstrianCountRothenburg,
+  pedenstrianCountLudgeristraße,
+  pedenstrianCountAlterFischmarkt,
+  pedenstrianCountSalzstraße,
+];
 
 client.on('connect', () => {
   cron.schedule(HYSTREET_UPDATE_INTERVAL, () => {
-    pedenstrianCountRothenburg.update();
-    pedenstrianCountLudgeristraße.update();
-    pedenstrianCountAlterFischmarkt.update();
+    controllers.forEach((c) => c.update());
   });
 
-  pedenstrianCountRothenburg.update();
-  pedenstrianCountLudgeristraße.update();
-  pedenstrianCountAlterFischmarkt.update();
+  controllers.forEach((c) => c.update());
 });
 
 // routes
@@ -77,10 +96,12 @@ router.get('/', async (req, res) => {
   const alterFischmarkt: any = await client.get(
     'pedenstrianCountAlterFischmarkt'
   );
+  const salzstraße: any = await client.get('pedenstrianCountSalzstraße');
   const data = [
     JSON.parse(rothenburg),
     JSON.parse(ludgeristraße),
     JSON.parse(alterFischmarkt),
+    JSON.parse(salzstraße),
   ];
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
@@ -103,13 +124,12 @@ router.get('/timeseries', async (req, res) => {
     return;
   }
 
-  const data = [
-    JSON.parse(await pedenstrianCountRothenburg.getTimeSeriesData(from, to)),
-    JSON.parse(await pedenstrianCountLudgeristraße.getTimeSeriesData(from, to)),
-    JSON.parse(
-      await pedenstrianCountAlterFischmarkt.getTimeSeriesData(from, to)
-    ),
-  ];
+  const data = await Promise.all(
+    controllers.map(async (c) =>
+      JSON.parse(await c.getTimeSeriesData(from, to))
+    )
+  );
+
   res.setHeader('Content-Type', 'application/json');
   res.send(data);
 });
