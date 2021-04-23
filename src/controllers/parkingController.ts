@@ -41,6 +41,24 @@ export default class ParkingController extends HttpController {
     public options?: IOptions
   ) {
     super(url, key);
+
+    this.fetchTotalParking();
+  }
+
+  private totalParkingLots = {};
+
+  private async fetchTotalParking() {
+    const parkingNowRequest = await axios.get(this.url);
+    const parkingTotal = await parkingNowRequest.data.features.map((f) => ({
+      [f.properties.NAME.replace('Parkhaus ', '')
+        .replace('Parkplatz ', '')
+        .replace('PH ', '')
+        .replace('Münster-Arkaden', 'Münster Arkaden')
+        .replace('Hörster Platz', 'Hörsterplatz')]: f.properties.parkingTotal,
+    }));
+
+    this.totalParkingLots = Object.assign({}, ...parkingTotal);
+    console.log(this.totalParkingLots);
   }
 
   public async getTimeSeriesData(from: Date, to: Date): Promise<any> {
@@ -54,7 +72,6 @@ export default class ParkingController extends HttpController {
     url = updateQueryStringParameter(url, 'to', to.toISOString());
     try {
       const dates = getDateArray(from, to);
-
       const data = await Promise.all(
         await dates.map(async (date: Date) => {
           try {
@@ -68,10 +85,21 @@ export default class ParkingController extends HttpController {
             const data = await request.data;
             const csvData = await csv().fromString(data);
 
-            return Object.keys(csvData).map((key) => ({
-              ...csvData[key],
-              timestamp: csvData[key]['Datum und Uhrzeit'],
-            }));
+            return Object.keys(csvData).map((key) => {
+              const data = Object.keys(csvData[key]).map((e) => {
+                const total = this.totalParkingLots[
+                  e.replace('PH ', '').replace('PP ', '')
+                ];
+                return {
+                  [e]: total - csvData[key][e],
+                };
+              });
+
+              return {
+                ...Object.assign({}, ...data),
+                timestamp: csvData[key]['Datum und Uhrzeit'],
+              };
+            });
           } catch (e) {}
         })
       );
