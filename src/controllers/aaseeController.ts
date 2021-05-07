@@ -81,23 +81,59 @@ export default class AaseeController extends BaseController {
         reject('Invalid Date');
       });
     }
-    try {
-      const request = await axios.post(
-        this.url,
-        { ...this.options.postBody, from },
-        this.options?.reqConfig ?? {}
-      );
-      let data = await request.data;
 
-      if (this.options?.formatter) {
-        data = this.options.formatter(data);
+    try {
+      let data = [];
+
+      // get range from to (with current time as last element)
+      let dateRange = this.getDateRange(from, new Date());
+      dateRange[dateRange.length - 1] = new Date();
+
+      // loop trough date ranges and fetch data in pairs (from-to)
+      for (var i = 0; i < dateRange.length - 1; i++) {
+        const curr = dateRange[i];
+        const next = dateRange[i + 1];
+
+        const request = await axios.post(
+          this.url,
+          { ...this.options.postBody, from: curr, to: next },
+          this.options?.reqConfig ?? {}
+        );
+
+        const timeRangeData = await request.data;
+        data.push(timeRangeData);
       }
 
-      return data;
+      // use first element as data to send and fill with all other datasets
+      let first = data.shift();
+      data.forEach((e) => {
+        first.data.water_temperature.push(...e.data.water_temperature);
+        first.data.dissolved_oxygen.push(...e.data.dissolved_oxygen);
+        first.data.pH.push(...e.data.pH);
+      });
+
+      return first;
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
         reject(error);
       });
     }
   }
+
+  /**
+   * Get range of dates
+   * @param {Date} start
+   * @param {Date} end
+   * @returns {array}
+   */
+  private getDateRange = function (start: Date, end: Date) {
+    for (
+      var a = [], d = new Date(start);
+      d <= end;
+      d.setDate(d.getDate() + 1)
+    ) {
+      a.push(new Date(d));
+    }
+    return a;
+  };
 }
