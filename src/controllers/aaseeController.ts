@@ -112,6 +112,16 @@ export default class AaseeController extends BaseController {
         first.data.pH.push(...e.data.pH);
       });
 
+      first.data.water_temperature.sort(
+        (a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()
+      );
+      first.data.dissolved_oxygen.sort(
+        (a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()
+      );
+      first.data.pH.sort(
+        (a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()
+      );
+
       return first;
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
@@ -130,7 +140,7 @@ export default class AaseeController extends BaseController {
     for (
       var a = [], d = new Date(start);
       d <= end;
-      d.setDate(d.getDate() + 1)
+      d.setDate(d.getDate() + 2)
     ) {
       a.push(new Date(d));
     }
