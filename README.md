@@ -43,6 +43,16 @@ Otherwise follow these steps:
 2. Create a new router in `src/routes` on which you want to distribute your data
 3. Register your new router in `src/app.ts`
 
+#### Add license header to file
+
+After creating a new file in the `src` directory, please run the `license-header` script to prepend a comment with license information to the file. You can simply run
+
+```sh
+yarn license-header # or npm run license-header
+```
+
+which automatically updates the file
+
 #### License
 
 Copyright (C) 2022 Reedu GmbH & Co. KG
