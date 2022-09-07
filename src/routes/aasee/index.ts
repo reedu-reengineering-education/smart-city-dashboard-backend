@@ -55,6 +55,7 @@ const aasee = new AaseeController(
   }
 );
 
+// after connection to redis db is established start to update data repeatedly
 client.on('connect', () => {
   cron.schedule(AASEE_UPDATE_INTERVAL, async () => {
     await aasee.update();

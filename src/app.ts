@@ -33,6 +33,7 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(cors());
 }
 
+// the index route which gives information about the available routes
 app.get('/', async (req, res) => {
   res.header('Content-Type', 'text/plain; charset=utf-8');
   res.send(`

@@ -99,6 +99,7 @@ const controllers = [
   pedenstrianCountSalzstraße,
 ];
 
+// after connection to redis db is established start to update data repeatedly
 client.on('connect', () => {
   cron.schedule(HYSTREET_UPDATE_INTERVAL, () => {
     controllers.forEach((c) => c.update());

@@ -40,6 +40,7 @@ const bicycle = new EcoCounterController(
   }
 );
 
+// after connection to redis db is established start to update data repeatedly
 client.on('connect', () => {
   cron.schedule(ECO_COUNTER_UPDATE_INTERVAL, async () => {
     await bicycle.update();

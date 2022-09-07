@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// adds a query string parameter to the url if not present or if it's present, updates the url
 // https://stackoverflow.com/a/6021027/5660646
 export const updateQueryStringParameter = (uri, key, value) => {
   var re = new RegExp('([?&])' + key + '=.*?(&|$)', 'i');

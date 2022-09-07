@@ -46,6 +46,7 @@ const parkhaus = new ParkingController(
   }
 );
 
+// after connection to redis db is established start to update data repeatedly
 client.on('connect', () => {
   cron.schedule(PARKHAUS_UPDATE_INTERVAL, async () => {
     await parkhaus.update();
