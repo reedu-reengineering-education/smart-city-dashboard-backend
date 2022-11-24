@@ -57,7 +57,8 @@ export default class HystreetController extends HttpController {
     try {
       const request = await axios.get(url, this.options.reqConfig);
       const data = await request.data;
-      return await client.set(
+
+      const result = await client.set(
         this.key,
         JSON.stringify({
           ...data,
@@ -67,6 +68,7 @@ export default class HystreetController extends HttpController {
           },
         })
       );
+      return result === 'OK';
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
         reject(error);
