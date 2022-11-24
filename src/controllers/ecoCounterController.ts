@@ -133,7 +133,7 @@ export default class EcoCounterController extends BaseController {
 
       return await Promise.all<boolean>([
         ...counterPromises,
-        await client.set(this.key, JSON.stringify(data)),
+        (await client.set(this.key, JSON.stringify(data))) === 'OK',
       ]);
     } catch (error) {
       return new Promise<boolean[]>((resolve, reject) => {

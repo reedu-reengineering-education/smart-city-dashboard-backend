@@ -64,7 +64,9 @@ export default class OpenSenseMapController extends HttpController {
         y: Math.round(value.y * 100) / 100,
       }));
 
-      return await client.set(this.key, JSON.stringify(smooth));
+      const result = await client.set(this.key, JSON.stringify(smooth));
+
+      return result === 'OK';
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
         reject(error);

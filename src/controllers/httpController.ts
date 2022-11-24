@@ -67,7 +67,7 @@ export default class HttpController extends BaseController {
       }
 
       if (this.options?.location) {
-        return await client.set(
+        const result = await client.set(
           this.key,
           JSON.stringify({
             ...data,
@@ -77,9 +77,11 @@ export default class HttpController extends BaseController {
             },
           })
         );
+        return result === 'OK';
       }
 
-      return await client.set(this.key, JSON.stringify(data));
+      const result = await client.set(this.key, JSON.stringify(data));
+      return result === 'OK';
     } catch (error) {
       return new Promise<boolean>((resolve, reject) => {
         reject(error);
