@@ -28,7 +28,7 @@ const HYSTREET_UPDATE_INTERVAL: string = '*/10 * * * *'; // all 10 minutes
 
 // controller
 const pedenstrianCountRothenburg = new HystreetController(
-  'https://hystreet.com/api/locations/100',
+  'https://api.hystreet.com/locations/100',
   'pedenstrianCountRothenburg',
   {
     location: {
@@ -44,7 +44,7 @@ const pedenstrianCountRothenburg = new HystreetController(
   }
 );
 const pedenstrianCountLudgeristraße = new HystreetController(
-  'https://hystreet.com/api/locations/117',
+  'https://api.hystreet.com/locations/117',
   'pedenstrianCountLudgeristraße',
   {
     location: {
@@ -60,7 +60,7 @@ const pedenstrianCountLudgeristraße = new HystreetController(
   }
 );
 const pedenstrianCountAlterFischmarkt = new HystreetController(
-  'https://hystreet.com/api/locations/296',
+  'https://api.hystreet.com/locations/296',
   'pedenstrianCountAlterFischmarkt',
   {
     location: {
@@ -76,7 +76,7 @@ const pedenstrianCountAlterFischmarkt = new HystreetController(
   }
 );
 const pedenstrianCountSalzstraße = new HystreetController(
-  'https://hystreet.com/api/locations/310',
+  'https://api.hystreet.com/locations/310',
   'pedenstrianCountSalzstraße',
   {
     location: {
